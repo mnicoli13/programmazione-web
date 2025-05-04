@@ -39,6 +39,8 @@ header h1:hover {
   font-weight: 500;
   padding: 0.8rem 1.2rem;
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .navbar-light .navbar-nav .nav-link:hover {
@@ -75,6 +77,10 @@ h6 {
 .page-title {
   font-weight: 600;
   color: var(--text-primary);
+}
+
+.page-title i {
+  height: 100%;
 }
 
 /* Table Styles */

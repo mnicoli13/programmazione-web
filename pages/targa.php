@@ -4,7 +4,16 @@ require_once '../config/constants.php';
 // Set page title
 $pageTitle = 'Gestione Targhe';
 $tableName = TABLE_TARGA;
-$filterFields = ['numero', 'dataEm', 'stato'];
+
+// Definisci i campi di filtro specifici per questa pagina
+$filterFields = [
+    'numero',  // Filtro per numero di targa
+    'dataEm',  // Filtro per data emissione
+    'stato'    // Filtro per stato della targa (Attiva, Restituita, Non assegnata)
+];
+
+// Descrizione della pagina e dei filtri disponibili
+$pageDescription = "In questa sezione puoi visualizzare tutte le targhe registrate nel sistema con le relative date di emissione e il loro stato attuale (Attiva, Restituita o Non assegnata). Puoi filtrare le targhe per numero, data di emissione o stato.";
 ?>
 
 <?php include("../template-parts/header.php") ?>
@@ -16,7 +25,7 @@ $filterFields = ['numero', 'dataEm', 'stato'];
         <h1 class="page-title"><i class="bi bi-tag"></i> <?php echo $pageTitle; ?></h1>
     </div>
     <p class="intro-text">
-        In questa sezione puoi visualizzare tutte le targhe registrate nel sistema con le relative date di emissione e il loro stato attuale (Attiva, Restituita o Non assegnata). Usa i filtri per trovare targhe specifiche.
+        <?php echo $pageDescription; ?>
     </p>
 </div>
 
@@ -49,10 +58,10 @@ $filterFields = ['numero', 'dataEm', 'stato'];
         <h5 class="card-title"><i class="bi bi-info-circle text-primary"></i> Informazioni sulle targhe</h5>
         <p class="card-text">Le targhe vengono assegnate ai veicoli e possono essere attive o restituite. Puoi visualizzare i dettagli delle assegnazioni nelle sezioni "Targhe Attive" e "Targhe Restituite".</p>
         <div class="mt-3">
-            <a href="?page=targa_attiva" class="btn btn-outline-primary me-2">
+            <a href="targa_attiva.php" class="btn btn-outline-primary me-2">
                 <i class="bi bi-check-circle"></i> Vedi Targhe Attive
             </a>
-            <a href="?page=targa_restituita" class="btn btn-outline-primary">
+            <a href="targa_restituita.php" class="btn btn-outline-primary">
                 <i class="bi bi-arrow-return-left"></i> Vedi Targhe Restituite
             </a>
         </div>
@@ -67,19 +76,6 @@ $filterFields = ['numero', 'dataEm', 'stato'];
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
-        
-        // Aggiunta di un select per il filtro dello stato delle targhe
-        const statoFilter = $('select[name="stato"]');
-        if (statoFilter.length > 0) {
-            // Rimuoviamo eventuali opzioni precedenti
-            statoFilter.empty();
-            
-            // Aggiungiamo le opzioni
-            statoFilter.append('<option value="">Tutti gli stati</option>');
-            statoFilter.append('<option value="Attiva">Attiva</option>');
-            statoFilter.append('<option value="Restituita">Restituita</option>');
-            statoFilter.append('<option value="Non assegnata">Non assegnata</option>');
-        }
     });
 </script> 
 

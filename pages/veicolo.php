@@ -3,7 +3,17 @@ require_once '../config/constants.php';
 // Set page title
 $pageTitle = 'Gestione Veicoli';
 $tableName = TABLE_VEICOLO;
-$filterFields = ['telaio', 'marca', 'modello', 'dataProd'];
+
+// Definisci i campi di filtro specifici per questa pagina
+$filterFields = [
+    'telaio',  // Filtro per numero di telaio
+    'marca',   // Filtro per marca del veicolo
+    'modello', // Filtro per modello del veicolo 
+    'dataProd' // Filtro per data di produzione
+];
+
+// Descrizione della pagina e dei filtri disponibili
+$pageDescription = "In questa sezione puoi visualizzare, aggiungere, modificare ed eliminare veicoli. Puoi utilizzare i filtri per cercare veicoli specifici per telaio, marca, modello o data di produzione.";
 ?>
 
 <?php include("../template-parts/header.php") ?>
@@ -18,7 +28,7 @@ $filterFields = ['telaio', 'marca', 'modello', 'dataProd'];
         </button>
     </div>
     <p class="intro-text">
-        In questa sezione puoi visualizzare, aggiungere, modificare ed eliminare veicoli. Usa i filtri per cercare veicoli specifici.
+        <?php echo $pageDescription; ?>
     </p>
 </div>
 
@@ -94,10 +104,7 @@ $filterFields = ['telaio', 'marca', 'modello', 'dataProd'];
 <div id="empty-state" class="empty-state" style="display: none;">
     <i class="bi bi-search"></i>
     <h4>Nessun veicolo trovato</h4>
-    <p>Prova a modificare i filtri o aggiungi un nuovo veicolo utilizzando il pulsante in alto.</p>
-    <button class="btn btn-primary" id="add-veicolo-empty-btn">
-        <i class="bi bi-plus-circle"></i> Aggiungi Veicolo
-    </button>
+    <p>Prova a modificare i filtri o aggiungi un nuovo veicolo utilizzando il pulsante in alto.</p>xs
 </div>
 
 <!-- Table container -->
@@ -128,6 +135,21 @@ $filterFields = ['telaio', 'marca', 'modello', 'dataProd'];
         // Close form on X click
         $('#close-form-btn').on('click', function() {
             $('#veicolo-form-container').slideUp();
+        });
+        
+        // Cancel form
+        $('#cancel-form-btn').on('click', function() {
+            $('#veicolo-form-container').slideUp();
+        });
+        
+        // Add Vehicle button click
+        $('#add-veicolo-btn').on('click', function() {
+            // Reset form
+            $('#veicolo-form')[0].reset();
+            $('#veicolo-form-action').val('add');
+            $('#veicolo-form-title').html('<i class="bi bi-plus-circle"></i> Aggiungi Veicolo');
+            $('#veicolo-form-container').slideDown();
+            $('#telaio').prop('readonly', false);
         });
     });
 </script>

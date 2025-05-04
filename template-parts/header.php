@@ -28,13 +28,13 @@
     <body>
         <header id="header" class="header py-3 border-bottom">
             <div class="container">
-                <div class="d-flex justify-content-center align-items-center">
+                <div class="d-flex justify-content-between align-items-center">
                     <a href="index.php" class="logo text-decoration-none">
                         <i class="bi bi-car-front"></i> <?php echo SITE_TITLE; ?>
                     </a>
                     
                     <!-- User menu or login button -->
-                    <?php if ($authenticated): ?>
+                    <?php if (isAuthenticated()): ?>
                         <div>   
                             <!-- User Menu -->
                             <div class="dropdown" id="user-menu">
@@ -42,10 +42,6 @@
                                     <i class="bi bi-person-circle"></i> <span id="user-menu-username"><?php echo htmlspecialchars($user['username']); ?></span>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="user-menu-dropdown">
-                                    <li><h6 class="dropdown-header">Account</h6></li>
-                                    <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Profilo</a></li>
-                                    <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Impostazioni</a></li>
-                                    <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item text-danger" href="#" id="logout-button"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
                                 </ul>
                             </div>

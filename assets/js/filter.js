@@ -1,19 +1,42 @@
 // Document ready function for filter functionality
 $(document).ready(function () {
+  // Inizializza tooltips per i filtri
+  var tooltipTriggerList = [].slice.call(
+    document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  );
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+
   // Submit filter form
   $("#filter-form").on("submit", function (e) {
     e.preventDefault();
     const filterData = $(this).serialize();
+
+    // Show loading state
+    $("#table-container").html(
+      '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Caricamento...</span></div><p class="mt-2 text-muted">Caricamento dei dati in corso...</p></div>'
+    );
+
     loadTableData(filterData);
 
+    // Aggiorna status filtri
+    updateFilterStatus();
+
     // Show feedback that filters are applied
-    showNotification('<i class="bi bi-funnel"></i> Filtri applicati', "info");
+    showNotification(
+      '<i class="bi bi-funnel"></i> Filtri applicati con successo',
+      "info"
+    );
   });
 
   // Reset filter form
   $("#reset-filter").on("click", function () {
     $("#filter-form")[0].reset();
     loadTableData("");
+
+    // Nascondi status filtri
+    $("#filter-status").addClass("d-none");
 
     // Show feedback that filters are reset
     showNotification(
@@ -22,28 +45,86 @@ $(document).ready(function () {
     );
   });
 
-  // Handle URL parameters for filtering
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.has("filter")) {
-    const filterValue = urlParams.get("filter");
-    const filterTarget = urlParams.get("target") || "telaio"; // Default to telaio if not specified
+  // Clear filters
+  $("#filter-clear-btn").on("click", function () {
+    $("#reset-filter").click();
+  });
 
-    // Set the filter field value
-    $("#filter-" + filterTarget).val(filterValue);
-
-    // Submit the filter form
-    $("#filter-form").trigger("submit");
-  } else {
-    // Load initial data without filters
-    loadTableData("");
-  }
-
-  // Toggle filter collapse
+  // Toggle filter collapse - aggiorna icona
   $('[data-bs-toggle="collapse"]').on("click", function () {
     const icon = $(this).find("i");
     icon.toggleClass("bi-chevron-up bi-chevron-down");
   });
+
+  // Gestione URL parametri per filtri con deep linking
+  const urlParams = new URLSearchParams(window.location.search);
+  let hasFilters = false;
+
+  // Se ci sono parametri di filtro, li applichiamo
+  $("#filter-form")
+    .find("input, select")
+    .each(function () {
+      const fieldName = $(this).attr("name");
+      if (urlParams.has(fieldName)) {
+        const fieldValue = urlParams.get(fieldName);
+        $(this).val(fieldValue);
+        hasFilters = true;
+      }
+    });
+
+  if (hasFilters) {
+    // Submit form se abbiamo trovato parametri
+    $("#filter-form").trigger("submit");
+  } else {
+    // Carica dati senza filtri
+    loadTableData("");
+  }
 });
+
+// Function to update filter status indicators
+function updateFilterStatus() {
+  const activeFilters = [];
+
+  $("#filter-form")
+    .find("input, select")
+    .each(function () {
+      const fieldValue = $(this).val();
+      if (fieldValue) {
+        const fieldName = $(this).attr("name");
+        const fieldLabel = $("label[for='filter-" + fieldName + "']").text();
+        activeFilters.push(fieldLabel + ": " + fieldValue);
+      }
+    });
+
+  if (activeFilters.length > 0) {
+    $("#filter-status-text").html(
+      '<i class="bi bi-funnel-fill me-1"></i> Filtri attivi: ' +
+        activeFilters.join(", ")
+    );
+    $("#filter-status").removeClass("d-none");
+  } else {
+    $("#filter-status").addClass("d-none");
+  }
+}
+
+// Function to show notifications
+function showNotification(message, type = "info") {
+  let notificationHtml =
+    '<div class="alert alert-' +
+    type +
+    ' alert-dismissible fade show" role="alert">';
+  notificationHtml += message;
+  notificationHtml +=
+    '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+  notificationHtml += "</div>";
+
+  $("#notification-area").html(notificationHtml);
+
+  // Auto-hide after 5 seconds
+  setTimeout(function () {
+    $(".alert").alert("close");
+  }, 5000);
+}
 
 // Function to load table data with filters
 function loadTableData(filterData) {
@@ -217,4 +298,21 @@ function renderTable(data, columns, tableName) {
     // Load data with new sorting
     loadTableData(filterData + "&sort=" + column + "&order=" + newOrder);
   });
+
+  // Handle detail links
+  $(".table-link").on("click", function (e) {
+    e.preventDefault();
+    const target = $(this).data("target");
+    const value = $(this).data("value");
+
+    // Redirect to detail page
+    window.location.href = "../pages/" + target + ".php?id=" + value;
+  });
+}
+
+// Format date function
+function formatDate(dateString) {
+  const options = { day: "2-digit", month: "2-digit", year: "numeric" };
+  const date = new Date(dateString);
+  return date.toLocaleDateString("it-IT", options);
 }

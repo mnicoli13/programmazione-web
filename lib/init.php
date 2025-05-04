@@ -71,12 +71,6 @@ if (!isAuthenticated()) {
         exit;
     }
     
-    // Se la pagina richiesta non esiste, reindirizza a 404.php
-    if (!pageExists($currentPage) && $currentPage !== '404.php') {
-        header('Location: /pages/404.php');
-        exit;
-    }
-    
     // Recupera i dati dell'utente dalla sessione
     $user = [
         'id' => $_SESSION['user_id'],
