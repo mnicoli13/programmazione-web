@@ -23,10 +23,9 @@ try {
 
     // Destroy the session
     session_destroy();
-    
-    http_response_code(200);
 
     // Return success response
+    http_response_code(200);
     echo json_encode([
         'success' => true,
         'message' => 'Logout effettuato con successo'

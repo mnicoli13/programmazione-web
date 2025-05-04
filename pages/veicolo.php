@@ -23,7 +23,7 @@ $pageDescription = "In questa sezione puoi visualizzare, aggiungere, modificare 
 <div class="mb-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="page-title"><i class="bi bi-car-front"></i> <?php echo $pageTitle; ?></h1>
-        <button id="add-veicolo-btn" class="btn btn-primary">
+        <button id="add-veicolo-btn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addVeicoloModal">
             <i class="bi bi-plus-circle"></i> Aggiungi Veicolo
         </button>
     </div>
@@ -35,68 +35,6 @@ $pageDescription = "In questa sezione puoi visualizzare, aggiungere, modificare 
 <!-- Notification area -->
 <div id="notification-area"></div>
 
-<!-- Vehicle form container -->
-<div id="veicolo-form-container" class="card shadow-sm mb-4" style="display: none;">
-    <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h5 id="veicolo-form-title" class="mb-0"><i class="bi bi-pencil-square"></i> Aggiungi Veicolo</h5>
-        <button type="button" class="btn-close" aria-label="Close" id="close-form-btn"></button>
-    </div>
-    <div class="card-body">
-        <div class="alert alert-info mb-3">
-            <i class="bi bi-info-circle me-2"></i> Compila tutti i campi obbligatori contrassegnati con * per procedere.
-        </div>
-        
-        <form id="veicolo-form" class="row g-3">
-            <input type="hidden" id="veicolo-form-action" name="action" value="add">
-            
-            <div class="col-md-6">
-                <label for="telaio" class="form-label">Numero di Telaio *</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-upc-scan"></i></span>
-                    <input type="text" class="form-control" id="telaio" name="telaio" required>
-                </div>
-                <div class="form-help">Inserisci il numero di telaio univoco del veicolo</div>
-            </div>
-            
-            <div class="col-md-6">
-                <label for="marca" class="form-label">Marca *</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-building"></i></span>
-                    <input type="text" class="form-control" id="marca" name="marca" required>
-                </div>
-                <div class="form-help">Inserisci la casa produttrice del veicolo</div>
-            </div>
-            
-            <div class="col-md-6">
-                <label for="modello" class="form-label">Modello *</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-car-front"></i></span>
-                    <input type="text" class="form-control" id="modello" name="modello" required>
-                </div>
-                <div class="form-help">Inserisci il modello specifico del veicolo</div>
-            </div>
-            
-            <div class="col-md-6">
-                <label for="dataProd" class="form-label">Data Produzione *</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
-                    <input type="date" class="form-control" id="dataProd" name="dataProd" required>
-                </div>
-                <div class="form-help">Seleziona la data di produzione del veicolo</div>
-            </div>
-            
-            <div class="col-12 mt-4">
-                <button type="submit" class="btn btn-primary me-2">
-                    <i class="bi bi-save"></i> Salva
-                </button>
-                <button type="button" id="cancel-form-btn" class="btn btn-secondary">
-                    <i class="bi bi-x-circle"></i> Annulla
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
 <!-- Include the filter component -->
 <?php include("../template-parts/filter.php"); ?>
 
@@ -104,7 +42,10 @@ $pageDescription = "In questa sezione puoi visualizzare, aggiungere, modificare 
 <div id="empty-state" class="empty-state" style="display: none;">
     <i class="bi bi-search"></i>
     <h4>Nessun veicolo trovato</h4>
-    <p>Prova a modificare i filtri o aggiungi un nuovo veicolo utilizzando il pulsante in alto.</p>xs
+    <p>Prova a modificare i filtri o aggiungi un nuovo veicolo utilizzando il pulsante in alto.</p>
+    <button class="btn btn-primary" id="add-veicolo-empty-btn" data-bs-toggle="modal" data-bs-target="#addVeicoloModal">
+        <i class="bi bi-plus-circle"></i> Aggiungi Veicolo
+    </button>
 </div>
 
 <!-- Table container -->
@@ -118,6 +59,11 @@ $pageDescription = "In questa sezione puoi visualizzare, aggiungere, modificare 
     </div>
 </div>
 
+<!-- Include modali -->
+<?php include("../template-parts/modals/add_veicolo_modal.php"); ?>
+<?php include("../template-parts/modals/edit_veicolo_modal.php"); ?>
+<?php include("../template-parts/modals/delete_veicolo_modal.php"); ?>
+
 <script>
     // Document ready function
     $(document).ready(function() {
@@ -129,28 +75,176 @@ $pageDescription = "In questa sezione puoi visualizzare, aggiungere, modificare 
         
         // Add Vehicle from empty state
         $('#add-veicolo-empty-btn').on('click', function() {
-            $('#add-veicolo-btn').click();
+            $('#addVeicoloModal').modal('show');
         });
         
-        // Close form on X click
-        $('#close-form-btn').on('click', function() {
-            $('#veicolo-form-container').slideUp();
+        // Listener per il pulsante salva del modale di aggiunta
+        $('#save-add-veicolo').on('click', function() {
+            const form = $('#add-veicolo-form');
+            
+            // Validazione del form
+            if (!form[0].checkValidity()) {
+                form[0].reportValidity();
+                return;
+            }
+            
+            // Raccolta dati
+            const formData = new FormData(form[0]);
+            
+            // Invio dati
+            $.ajax({
+                url: '../api/crud/add_veicolo.php',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status === 'success') {
+                        // Chiudi il modale
+                        $('#addVeicoloModal').modal('hide');
+                        
+                        // Resetta il form
+                        form[0].reset();
+                        
+                        // Mostra notifica
+                        showNotification('<i class="bi bi-check-circle"></i> ' + response.message, 'success');
+                        
+                        // Ricarica i dati
+                        loadTableData('');
+                    } else {
+                        showNotification('<i class="bi bi-exclamation-triangle"></i> ' + response.message, 'danger');
+                    }
+                },
+                error: function() {
+                    showNotification('<i class="bi bi-exclamation-triangle"></i> Errore durante la comunicazione con il server', 'danger');
+                }
+            });
         });
         
-        // Cancel form
-        $('#cancel-form-btn').on('click', function() {
-            $('#veicolo-form-container').slideUp();
+        // Handler per il pulsante modifica nella tabella
+        $(document).on('click', '.edit-btn', function() {
+            const id = $(this).data('id');
+            
+            // Carica i dati del veicolo
+            $.ajax({
+                url: '../api/crud/get_veicolo.php',
+                type: 'GET',
+                data: { telaio: id },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        // Popolamento form
+                        $('#edit-original-telaio').val(response.data.telaio);
+                        $('#edit-telaio').val(response.data.telaio);
+                        $('#edit-marca').val(response.data.marca);
+                        $('#edit-modello').val(response.data.modello);
+                        $('#edit-dataProd').val(response.data.dataProd);
+                        
+                        // Mostra modale
+                        $('#editVeicoloModal').modal('show');
+                    } else {
+                        showNotification('<i class="bi bi-exclamation-triangle"></i> ' + response.message, 'danger');
+                    }
+                },
+                error: function() {
+                    showNotification('<i class="bi bi-exclamation-triangle"></i> Errore durante il caricamento dei dati del veicolo', 'danger');
+                }
+            });
         });
         
-        // Add Vehicle button click
-        $('#add-veicolo-btn').on('click', function() {
-            // Reset form
-            $('#veicolo-form')[0].reset();
-            $('#veicolo-form-action').val('add');
-            $('#veicolo-form-title').html('<i class="bi bi-plus-circle"></i> Aggiungi Veicolo');
-            $('#veicolo-form-container').slideDown();
-            $('#telaio').prop('readonly', false);
+        // Listener per il pulsante salva del modale di modifica
+        $('#save-edit-veicolo').on('click', function() {
+            const form = $('#edit-veicolo-form');
+            
+            // Validazione del form
+            if (!form[0].checkValidity()) {
+                form[0].reportValidity();
+                return;
+            }
+            
+            // Raccolta dati
+            const formData = new FormData(form[0]);
+            
+            // Invio dati
+            $.ajax({
+                url: '../api/crud/update_veicolo.php',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status === 'success') {
+                        // Chiudi il modale
+                        $('#editVeicoloModal').modal('hide');
+                        
+                        // Mostra notifica
+                        showNotification('<i class="bi bi-check-circle"></i> ' + response.message, 'success');
+                        
+                        // Ricarica i dati
+                        loadTableData('');
+                    } else {
+                        showNotification('<i class="bi bi-exclamation-triangle"></i> ' + response.message, 'danger');
+                    }
+                },
+                error: function() {
+                    showNotification('<i class="bi bi-exclamation-triangle"></i> Errore durante la comunicazione con il server', 'danger');
+                }
+            });
         });
+        
+        // Handler per il pulsante elimina nella tabella
+        $(document).on('click', '.delete-btn', function() {
+            const id = $(this).data('id');
+            $('#delete-telaio').val(id);
+            $('#delete-telaio-display').text(id);
+            $('#deleteVeicoloModal').modal('show');
+        });
+        
+        // Listener per il pulsante conferma del modale di eliminazione
+        $('#confirm-delete-veicolo').on('click', function() {
+            const form = $('#delete-veicolo-form');
+            const formData = new FormData(form[0]);
+            
+            $.ajax({
+                url: '../api/crud/delete_veicolo.php',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status === 'success') {
+                        // Chiudi il modale
+                        $('#deleteVeicoloModal').modal('hide');
+                        
+                        // Mostra notifica
+                        showNotification('<i class="bi bi-check-circle"></i> ' + response.message, 'success');
+                        
+                        // Ricarica i dati
+                        loadTableData('');
+                    } else {
+                        showNotification('<i class="bi bi-exclamation-triangle"></i> ' + response.message, 'danger');
+                    }
+                },
+                error: function() {
+                    showNotification('<i class="bi bi-exclamation-triangle"></i> Errore durante la comunicazione con il server', 'danger');
+                }
+            });
+        });
+        
+        // Funzione per mostrare notifiche
+        function showNotification(message, type = "info") {
+            let notificationHtml = '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">';
+            notificationHtml += message;
+            notificationHtml += '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+            notificationHtml += '</div>';
+            
+            $("#notification-area").html(notificationHtml);
+            
+            // Auto-hide after 5 seconds
+            setTimeout(function() {
+                $(".alert").alert('close');
+            }, 5000);
+        }
     });
 </script>
 

@@ -17,12 +17,6 @@ $(document).ready(function () {
     loadVeicoloData(id);
   });
 
-  // Handle delete button click
-  $(document).on("click", ".delete-btn", function () {
-    const id = $(this).data("id");
-    confirmDelete(id, "veicolo");
-  });
-
   // Submit veicolo form
   $("#veicolo-form").on("submit", function (e) {
     e.preventDefault();
@@ -176,92 +170,6 @@ function updateVeicolo(formData, callback) {
       if (callback) callback();
     },
   });
-}
-
-// Function to delete a vehicle
-function deleteRecord(id, entity) {
-  // Show confirmation dialog with more details
-  const confirmModal = `
-    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header bg-danger text-white">
-            <h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Conferma eliminazione</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p>Sei sicuro di voler eliminare questo ${entity}?</p>
-            <p class="text-danger"><strong>Attenzione:</strong> questa operazione non può essere annullata.</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-              <i class="bi bi-x-circle"></i> Annulla
-            </button>
-            <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
-              <i class="bi bi-trash"></i> Elimina
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Append modal to body if it doesn't exist
-  if (!$("#deleteConfirmModal").length) {
-    $("body").append(confirmModal);
-  }
-
-  // Show modal
-  const modal = new bootstrap.Modal(
-    document.getElementById("deleteConfirmModal")
-  );
-  modal.show();
-
-  // Handle confirm button click
-  $("#confirmDeleteBtn")
-    .off("click")
-    .on("click", function () {
-      // Hide modal
-      modal.hide();
-
-      // Show loading notification
-      showNotification(
-        '<i class="bi bi-hourglass-split"></i> Eliminazione in corso...',
-        "info"
-      );
-
-      // Perform delete operation
-      $.ajax({
-        url: "../api/crud/delete_" + entity + ".php",
-        type: "POST",
-        data: {
-          id: id,
-        },
-        dataType: "json",
-        success: function (response) {
-          if (response.status === "success") {
-            showNotification(
-              '<i class="bi bi-check-circle"></i> ' +
-                entity.charAt(0).toUpperCase() +
-                entity.slice(1) +
-                " eliminato con successo"
-            );
-            loadTableData(""); // Reload table data
-          } else {
-            showNotification(
-              '<i class="bi bi-exclamation-triangle"></i> ' + response.message,
-              "error"
-            );
-          }
-        },
-        error: function (xhr, status, error) {
-          showNotification(
-            '<i class="bi bi-wifi-off"></i> Errore di comunicazione con il server',
-            "error"
-          );
-        },
-      });
-    });
 }
 
 // Function to handle form validation errors

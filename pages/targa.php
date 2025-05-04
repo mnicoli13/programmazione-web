@@ -68,15 +68,4 @@ $pageDescription = "In questa sezione puoi visualizzare tutte le targhe registra
     </div>
 </div>
 
-<script>
-    // Document ready function
-    $(document).ready(function() {
-        // Initialize tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-    });
-</script> 
-
 <?php include("../template-parts/footer.php") ?>

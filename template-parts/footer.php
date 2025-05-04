@@ -10,16 +10,16 @@
                         <a href="#" class="text-decoration-none me-3 text-secondary">
                             <i class="bi bi-github"></i> GitHub
                         </a>
-                        <a href="#" class="text-decoration-none me-3 text-secondary">
-                            <i class="bi bi-book"></i> Documentazione
-                        </a>
-                        <a href="#" class="text-decoration-none text-secondary">
+                        <a href="#" class="text-decoration-none text-secondary" data-bs-toggle="modal" data-bs-target="#helpModal">
                             <i class="bi bi-question-circle"></i> Aiuto
                         </a>
                     </div>
                 </div>
             </div>
         </footer>
+
+        <?php include("../template-parts/modals/user-guide.php") ?>
+
 
         <!-- Back to top button -->
         <a href="#" class="back-to-top d-flex align-items-center justify-content-center">

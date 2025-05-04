@@ -14,6 +14,7 @@ $dataProd = isset($_POST['dataProd']) ? trim($_POST['dataProd']) : '';
 
 // Validate inputs
 if (empty($telaio) || empty($marca) || empty($modello) || empty($dataProd)) {
+    http_response_code(400);
     echo json_encode([
         'status' => 'error',
         'message' => 'Tutti i campi sono obbligatori'
@@ -38,6 +39,7 @@ try {
     mysqli_stmt_close($checkStmt);
     
     if ($row['count'] > 0) {
+        http_response_code(400);
         echo json_encode([
             'status' => 'error',
             'message' => 'Un veicolo con questo telaio esiste già'
@@ -53,12 +55,14 @@ try {
     mysqli_stmt_execute($stmt);
     mysqli_stmt_close($stmt);
     
+    http_response_code(200);
     echo json_encode([
         'status' => 'success',
         'message' => 'Veicolo aggiunto con successo'
     ]);
     
 } catch (Exception $e) {
+    http_response_code(500);
     echo json_encode([
         'status' => 'error',
         'message' => $e->getMessage()

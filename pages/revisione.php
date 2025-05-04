@@ -55,12 +55,4 @@ $pageDescription = "In questa sezione puoi visualizzare tutte le revisioni regis
     </div>
 </div>
 
-<script>
-    // Document ready function
-    $(document).ready(function() {
-        // Bootstrap Icons
-        $('head').append('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">');
-    });
-</script> 
-
 <?php include("../template-parts/footer.php") ?>

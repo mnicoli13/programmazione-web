@@ -90,7 +90,7 @@
                 </div>
                 <p class="card-text mb-4">Gestione completa del parco veicoli con possibilità di aggiungere, modificare ed eliminare.</p>
                 <div class="mt-auto">
-                    <a href="?page=veicolo" class="btn btn-primary w-100">
+                    <a href="/pages/veicolo.php" class="btn btn-primary w-100">
                         <i class="bi bi-arrow-right-circle"></i> Vai ai Veicoli
                     </a>
                 </div>
@@ -108,7 +108,7 @@
                 </div>
                 <p class="card-text mb-4">Visualizza e gestisci tutte le targhe registrate nel sistema con relativi dati di emissione.</p>
                 <div class="mt-auto">
-                    <a href="?page=targa" class="btn btn-primary w-100">
+                    <a href="/pages/targa.php" class="btn btn-primary w-100">
                         <i class="bi bi-arrow-right-circle"></i> Vai alle Targhe
                     </a>
                 </div>
@@ -126,7 +126,7 @@
                 </div>
                 <p class="card-text mb-4">Monitora tutte le revisioni dei veicoli con relativi esiti e motivazioni per quelle negative.</p>
                 <div class="mt-auto">
-                    <a href="?page=revisione" class="btn btn-primary w-100">
+                    <a href="/pages/revisione.php" class="btn btn-primary w-100">
                         <i class="bi bi-arrow-right-circle"></i> Vai alle Revisioni
                     </a>
                 </div>
@@ -134,7 +134,4 @@
         </div>
     </div>
 </div>
-
-<?php include("../template-parts/user-guide.php") ?>
-
 <?php include("../template-parts/footer.php") ?>
