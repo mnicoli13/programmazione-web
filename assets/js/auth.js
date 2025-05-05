@@ -208,11 +208,6 @@ $(document).ready(function () {
       },
     });
   });
-
-  $(".help-link").on("click", function (e) {
-    e.preventDefault();
-    $("#helpModal").modal("show");
-  });
 });
 
 // Function to show notification in the login/register form

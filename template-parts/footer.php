@@ -7,7 +7,7 @@
                         <span class="text-muted">&copy; <?php echo date('Y'); ?> Sistema Gestione Veicoli</span>
                     </div>
                     <div class="col-lg-6 text-lg-end text-center">
-                        <a href="#" class="text-decoration-none me-3 text-secondary">
+                        <a href="https://github.com/mnicoli13/programmazione-web" target="_blank" class="text-decoration-none me-3 text-secondary">
                             <i class="bi bi-github"></i> GitHub
                         </a>
                         <a href="#" class="text-decoration-none text-secondary" data-bs-toggle="modal" data-bs-target="#helpModal">

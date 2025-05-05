@@ -44,9 +44,7 @@
                         </div>
 
                         <div class="text-center mb-4">
-                            <a href="#" class="text-decoration-none text-muted small">Password dimenticata?</a>
-                            <span class="mx-2 text-muted">|</span>
-                            <a href="#" class="text-decoration-none text-muted small help-link">Aiuto</a>
+                            <a href="#" class="text-decoration-none text-muted small help-link" data-bs-toggle="modal" data-bs-target="#loginHelpModal">Aiuto</a>
                         </div>
                     </div>
 
