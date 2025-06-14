@@ -62,6 +62,7 @@ try {
                 $sql .= " ORDER BY " . $sort . " " . $order;
             }
             
+            
             // Prepare statement
             $stmt = mysqli_prepare($conn, $sql);
             
@@ -69,6 +70,16 @@ try {
             if (!empty($params)) {
                 $types = str_repeat('s', count($params)); // Assumiamo che tutti i parametri siano stringhe
                 mysqli_stmt_bind_param($stmt, $types, ...$params);
+            }
+
+            if(!$stmt){
+                http_response_code(500);
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => $sql
+                ]);
+                return;
+                exit;
             }
             
             // Execute query

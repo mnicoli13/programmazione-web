@@ -45,6 +45,44 @@ $pageDescription = "In questa sezione puoi visualizzare tutte le targhe che sono
 
 <!-- Table container -->
 <div id="table-container" data-table-name="<?php echo $tableName ?>" class="mb-4">
+    <div class="table-responsive">
+        <table id="myTable"
+            data-table-name="Targa-Restituita"
+            class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <!-- Qui dichiari tutte le colonne che hai in `columns` -->
+                    <th class="sortable" data-column="targa" data-order="asc">
+                        Targa <i class="bi bi-arrow-down-up text-muted small"></i>
+                    </th>
+                    <th class="sortable" data-column="veicolo" data-order="asc">
+                        Veicolo <i class="bi bi-arrow-down-up text-muted small"></i>
+                    </th>
+                    <th class="sortable" data-column="marca" data-order="asc">
+                        Marca <i class="bi bi-arrow-down-up text-muted small"></i>
+                    </th>
+                    <th class="sortable" data-column="modello" data-order="asc">
+                        Modello <i class="bi bi-arrow-down-up text-muted small"></i>
+                    </th>
+                    <th class="sortable" data-column="dataEm" data-order="asc">
+                        Data Emissione <i class="bi bi-arrow-down-up text-muted small"></i>
+                    </th>
+                    <th class="sortable" data-column="dataRes" data-order="asc">
+                        Data Restituzione <i class="bi bi-arrow-down-up text-muted small"></i>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- sarà riempito dinamicamente -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- optional: empty state -->
+    <div id="empty-state" style="display:none;">
+        Nessun risultato
+    </div>
+    
     <!-- Table will be loaded here via AJAX -->
     <div class="table-loader">
         <div class="text-center py-5">

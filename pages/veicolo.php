@@ -50,6 +50,39 @@ $pageDescription = "In questa sezione puoi visualizzare, aggiungere, modificare 
 
 <!-- Table container -->
 <div id="table-container" data-table-name="<?php echo $tableName ?>" class="mb-4">
+    <div class="table-responsive">
+        <table id="myTable"
+            data-table-name="Veicolo"
+            class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <!-- Qui dichiari tutte le colonne che hai in `columns` -->
+                    <th class="sortable" data-column="telaio" data-order="asc">
+                        Numero <i class="bi bi-arrow-down-up text-muted small"></i>
+                    </th>
+                    <th class="sortable" data-column="marca" data-order="asc">
+                        Marca <i class="bi bi-arrow-down-up text-muted small"></i>
+                    </th>
+                    <th class="sortable" data-column="modello" data-order="asc">
+                        Targa <i class="bi bi-arrow-down-up text-muted small"></i>
+                    </th>
+                    <th class="sortable" data-column="dataProd" data-order="asc">
+                        Data Produzione<i class="bi bi-arrow-down-up text-muted small"></i>
+                    </th>
+                    <th class="text-center">Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- sarà riempito dinamicamente -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- optional: empty state -->
+    <div id="empty-state" style="display:none;">
+        Nessun risultato
+    </div>
+    
     <!-- Table will be loaded here via AJAX -->
     <div class="table-loader">
         <div class="text-center py-5">

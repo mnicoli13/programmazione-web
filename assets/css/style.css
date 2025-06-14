@@ -342,9 +342,9 @@ footer {
 }
 
 .empty-state .bi {
-  font-size: 4rem;
+  font-size: 1rem;
   margin-bottom: 20px;
-  color: var(--primary-color);
+  color: white;
   opacity: 0.5;
 }
 

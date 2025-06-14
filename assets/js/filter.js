@@ -14,11 +14,13 @@ $(document).ready(function () {
     const filterData = $(this).serialize();
 
     // Show loading state
-    $("#table-container").html(
-      '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Caricamento...</span></div><p class="mt-2 text-muted">Caricamento dei dati in corso...</p></div>'
-    );
+    console.log("table loader show: ", $(".table-loader"));
+    $(".table-loader").show();
 
     loadTableData(filterData);
+
+    console.log("table loader hide: ", $(".table-loader"));
+    $(".table-loader").hide();
 
     // Aggiorna status filtri
     updateFilterStatus();
@@ -130,11 +132,10 @@ function showNotification(message, type = "info") {
 function loadTableData(filterData) {
   const tableName = $("#table-container").data("table-name");
 
-  console.log("filterData: ", filterData);
+  console.log(filterData + "&table=" + tableName);
+
   // Show loading state
-  $("#table-container").html(
-    '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Caricamento...</span></div><p class="mt-2 text-muted">Caricamento dei dati in corso...</p></div>'
-  );
+  $(".table-loader").show();
 
   // Hide empty state if visible
   $("#empty-state").hide();
@@ -184,9 +185,10 @@ function loadTableData(filterData) {
       );
     },
   });
+
+  $(".table-loader").hide();
 }
 
-// Function to render table with data, including sort state
 function renderTable(
   data,
   columns,
@@ -194,42 +196,36 @@ function renderTable(
   sortField = null,
   sortOrder = "asc"
 ) {
-  // Build table header
-  let tableHtml =
-    '<div class="table-responsive"><table class="table table-striped table-hover"><thead><tr>';
+  const $table = $("#myTable");
+  const $thead = $table.find("thead");
+  const $tbody = $table.find("tbody");
 
-  columns.forEach(function (column) {
-    // Check if this is the sorted column
-    const isSorted = column.name === sortField;
+  // 1) Aggiorna i data-order e le icone sugli <th>
+  $thead.find("th.sortable").each(function () {
+    const $th = $(this);
+    const col = $th.data("column");
+    const isSorted = col === sortField;
     const order = isSorted ? sortOrder : "asc";
-    // Choose the right icon
-    const iconClass = isSorted
-      ? sortOrder === "asc"
-        ? "bi-arrow-up"
-        : "bi-arrow-down"
+    const icon = isSorted
+      ? `bi-arrow-${sortOrder === "asc" ? "up" : "down"}`
       : "bi-arrow-down-up text-muted small";
 
-    tableHtml +=
-      `<th class="sortable" data-column="${column.name}" data-order="${order}">` +
-      `${column.label} <i class="bi ${iconClass}"></i></th>`;
+    $th
+      .data("order", order)
+      .find("i")
+      .attr("class", "bi " + icon);
   });
 
-  // Add action column if needed
-  if (tableName === "Veicolo") {
-    tableHtml += '<th class="text-center">Azioni</th>';
-  }
+  // 2) Popola il <tbody>
+  $tbody.empty();
+  data.forEach((row) => {
+    let $tr = $("<tr>");
+    columns.forEach((col) => {
+      let cell = row[col.name] || "";
 
-  tableHtml += "</tr></thead><tbody>";
-
-  // Build rows
-  data.forEach(function (row) {
-    tableHtml += "<tr>";
-    columns.forEach(function (column) {
-      let cell = row[column.name] || "";
-
-      if (column.type === "date") {
+      if (col.type === "date") {
         cell = cell ? formatDate(cell) : "";
-      } else if (column.type === "status") {
+      } else if (col.type === "status") {
         let badgeClass = "",
           icon = "";
         switch (cell) {
@@ -246,75 +242,54 @@ function renderTable(
             icon = "bi-dash-circle";
         }
         cell = `<span class="badge ${badgeClass}"><i class="bi ${icon} me-1"></i>${cell}</span>`;
-      } else if (column.isLink) {
+      } else if (col.isLink) {
         cell = `<a href="#" class="table-link" data-target="${
-          column.linkTarget
-        }" data-value="${
-          row[column.name]
-        }" title="Clicca per dettagli">${cell}</a>`;
+          col.linkTarget
+        }" data-value="${row[col.name]}">${cell}</a>`;
       }
-
-      tableHtml += `<td>${cell}</td>`;
+      $tr.append($("<td>").html(cell));
     });
 
-    // Action buttons
+    // azioni su Veicolo
     if (tableName === "Veicolo") {
-      tableHtml +=
-        '<td class="text-center">' +
-        `<button class="btn btn-sm btn-primary me-1 edit-btn" data-id="${row.telaio}" title="Modifica"><i class="bi bi-pencil"></i></button>` +
-        `<button class="btn btn-sm btn-danger delete-btn" data-id="${row.telaio}" title="Elimina"><i class="bi bi-trash"></i></button>` +
-        "</td>";
+      const editBtn = `<button class="btn btn-sm btn-primary edit-btn" data-id="${row.telaio}"><i class="bi bi-pencil"></i></button>`;
+      const deleteBtn = `<button class="btn btn-sm btn-danger delete-btn" data-id="${row.telaio}"><i class="bi bi-trash"></i></button>`;
+      $tr.append(
+        $("<td class='text-center d-flex gap-3 justify-content-end'>").html(
+          editBtn + deleteBtn
+        )
+      );
     }
 
-    tableHtml += "</tr>";
+    $tbody.append($tr);
   });
 
-  tableHtml += "</tbody></table></div>";
+  // 3) Ricollega i listener
 
-  // Result count
-  tableHtml =
-    `<div class="mb-3 text-muted small"><i class="bi bi-info-circle"></i> Trovati ${data.length} risultati</div>` +
-    tableHtml;
-
-  // Inject HTML
-  $("#table-container").html(tableHtml);
-
-  // Re-bind sorting handler
-  $(".sortable")
+  // Sorting
+  $thead
+    .find("th.sortable")
     .off("click")
     .on("click", function (e) {
       e.preventDefault();
       const $th = $(this);
       const column = $th.data("column");
-      const current = $th.data("order") || "asc";
+      const current = $th.data("order");
       const next = current === "asc" ? "desc" : "asc";
-
-      // Reset all headers
-      $(".sortable").removeData("order").find("i").remove();
-
-      // Set new state and icon
-      $th
-        .data("order", next)
-        .append(
-          ` <i class="bi bi-arrow-${next === "asc" ? "up" : "down"}"></i>`
-        );
-
-      // Reload data with new sort parameters
-      const filterData = $("#filter-form").serialize();
-      const params = `${filterData}&sort=${encodeURIComponent(
-        column
-      )}&order=${next}`;
+      const params =
+        $("#filter-form").serialize() + "&sort=" + column + "&order=" + next;
       loadTableData(params);
     });
 
-  // Re-bind detail links
-  $(".table-link")
+  // Link di dettaglio
+  $tbody
+    .find(".table-link")
     .off("click")
     .on("click", function (e) {
       e.preventDefault();
-      const target = $(this).data("target");
-      const value = $(this).data("value");
-      window.location.href = `../pages/${target}.php?id=${value}`;
+      const t = $(this).data("target");
+      const v = $(this).data("value");
+      window.location.href = `../pages/${t}.php?id=${v}`;
     });
 }
 
