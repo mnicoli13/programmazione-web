@@ -115,8 +115,8 @@
                         echo '<option value="Restituita">Restituita</option>';
                         echo '<option value="Non assegnata">Non assegnata</option>';
                     } elseif ($field === 'esito') {
-                        echo '<option value="Superata">Superata</option>';
-                        echo '<option value="Non superata">Non superata</option>';
+                        echo '<option value="positivo">Positivo</option>';
+                        echo '<option value="negativo">Negativo</option>';
                     }
                     
                     echo '</select>';
@@ -147,7 +147,7 @@
 <div id="filter-status" class="d-none mb-3 fadeIn">
   <div class="d-flex align-items-center">
     <div class="me-auto">
-      <span id="filter-status-text" class="badge bg-info text-white"></span>
+      <span id="filter-status-text" class="badge bg-primary text-white"></span>
     </div>
     <div>
       <button id="filter-clear-btn" class="btn btn-sm btn-outline-secondary">

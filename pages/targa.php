@@ -45,11 +45,13 @@ $pageDescription = "In questa sezione puoi visualizzare tutte le targhe registra
 <!-- Table container -->
 <div id="table-container" data-table-name="<?php echo $tableName ?>" class="mb-4">
     <!-- Table will be loaded here via AJAX -->
-    <div class="text-center py-5">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Caricamento...</span>
+    <div class="table-loader">
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Caricamento...</span>
+            </div>
+            <p class="mt-2 text-muted">Caricamento dei dati in corso...</p>
         </div>
-        <p class="mt-2 text-muted">Caricamento dei dati in corso...</p>
     </div>
 </div>
 

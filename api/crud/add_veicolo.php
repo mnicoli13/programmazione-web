@@ -1,7 +1,7 @@
 <?php
 // Include database connection
-require_once '../config/database.php';
-require_once '../config/constants.php';
+require_once '../../config/database.php';
+require_once '../../config/constants.php';
 
 // Set content type to JSON
 header('Content-Type: application/json');

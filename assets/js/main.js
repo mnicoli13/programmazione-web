@@ -37,27 +37,6 @@ $(document).ready(function () {
     );
   }
 
-  // Handle table sorting
-  $(".sortable").on("click", function () {
-    const column = $(this).data("column");
-    const currentOrder = $(this).data("order") || "asc";
-    const newOrder = currentOrder === "asc" ? "desc" : "asc";
-
-    // Remove all sorting indicators
-    $(".sortable").removeData("order").find("i").remove();
-
-    // Add sorting indicator to current column
-    $(this).data("order", newOrder);
-    const icon = newOrder === "asc" ? "bi-arrow-up" : "bi-arrow-down";
-    $(this).append(' <i class="bi ' + icon + '"></i>');
-
-    // Get current filter values
-    const filterData = $("#filter-form").serialize();
-
-    // Load data with new sorting
-    loadTableData(filterData + "&sort=" + column + "&order=" + newOrder);
-  });
-
   // Dynamic link handling for related tables
   $(document).on("click", ".table-link", function (e) {
     e.preventDefault();

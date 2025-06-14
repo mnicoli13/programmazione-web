@@ -51,6 +51,6 @@
             </div>
         </header>
 
-        <div class="container main-container py-4">
+        <div class="container main-container py-4 d-flex flex-column">
     
 

@@ -52,7 +52,7 @@
     </div>
     
     <div class="d-grid">
-        <button type="submit" class="btn btn-primary" id="register-button" disabled>
+        <button type="submit" class="btn btn-primary" id="register-button">
             <i class="bi bi-person-plus"></i> Registrati
         </button>
     </div>

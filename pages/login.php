@@ -4,12 +4,12 @@
 <div class="login-container container">
     <div class="row w-100">
         <!-- Left side: App features -->
-        <div class="col-md-4 d-none d-md-block">
+        <div class="col-md-6 d-none d-md-block">
             <?php include("../template-parts/login/features.php") ?>
         </div>
         
         <!-- Right side: Login/Register form -->
-        <div class="col-md-8">
+        <div class="col-md-6">
             <div class="login-form-container">
                 <div class="login-header">
                     <h2 class="text-center mb-3"><i class="bi bi-person-circle"></i> Accedi all'Area Riservata</h2>

@@ -1,6 +1,6 @@
         </div> <!-- End of main-container -->
         
-        <footer class="footer py-4 bg-light border-top mt-auto">
+        <footer class="footer py-4 border-top mt-auto">
             <div class="container">
                 <div class="row align-items-center">
                     <div class="col-lg-6 text-lg-start text-center mb-3 mb-lg-0">

@@ -130,6 +130,7 @@ function showNotification(message, type = "info") {
 function loadTableData(filterData) {
   const tableName = $("#table-container").data("table-name");
 
+  console.log("filterData: ", filterData);
   // Show loading state
   $("#table-container").html(
     '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Caricamento...</span></div><p class="mt-2 text-muted">Caricamento dei dati in corso...</p></div>'
@@ -152,7 +153,20 @@ function loadTableData(filterData) {
         } else {
           $("#empty-state").hide();
           $("#table-container").show();
-          renderTable(response.data, response.columns, tableName);
+
+          // ─── ESTRAGGO sort e order da filterData ─────────────────────────────
+          const params = new URLSearchParams(filterData);
+          const sortField = params.get("sort") || null;
+          const sortOrder = params.get("order") || null;
+          // ──────────────────────────────────────────────────────────────────────
+
+          renderTable(
+            response.data,
+            response.columns,
+            tableName,
+            sortField,
+            sortOrder
+          );
         }
       } else {
         $("#table-container").html(
@@ -172,19 +186,32 @@ function loadTableData(filterData) {
   });
 }
 
-// Function to render table with data
-function renderTable(data, columns, tableName) {
+// Function to render table with data, including sort state
+function renderTable(
+  data,
+  columns,
+  tableName,
+  sortField = null,
+  sortOrder = "asc"
+) {
+  // Build table header
   let tableHtml =
     '<div class="table-responsive"><table class="table table-striped table-hover"><thead><tr>';
 
-  // Table headers with sorting
   columns.forEach(function (column) {
+    // Check if this is the sorted column
+    const isSorted = column.name === sortField;
+    const order = isSorted ? sortOrder : "asc";
+    // Choose the right icon
+    const iconClass = isSorted
+      ? sortOrder === "asc"
+        ? "bi-arrow-up"
+        : "bi-arrow-down"
+      : "bi-arrow-down-up text-muted small";
+
     tableHtml +=
-      '<th class="sortable" data-column="' +
-      column.name +
-      '">' +
-      column.label +
-      ' <i class="bi bi-arrow-down-up text-muted small"></i></th>';
+      `<th class="sortable" data-column="${column.name}" data-order="${order}">` +
+      `${column.label} <i class="bi ${iconClass}"></i></th>`;
   });
 
   // Add action column if needed
@@ -194,66 +221,48 @@ function renderTable(data, columns, tableName) {
 
   tableHtml += "</tr></thead><tbody>";
 
-  // Table rows
+  // Build rows
   data.forEach(function (row) {
     tableHtml += "<tr>";
-
     columns.forEach(function (column) {
-      const value = row[column.name] || "";
+      let cell = row[column.name] || "";
 
-      // Format value based on column type
       if (column.type === "date") {
-        const formattedDate = value ? formatDate(value) : "";
-        tableHtml += "<td>" + formattedDate + "</td>";
+        cell = cell ? formatDate(cell) : "";
       } else if (column.type === "status") {
-        // Gestione speciale per lo stato delle targhe
-        let badgeClass = "";
-        let iconClass = "";
-
-        if (value === "Attiva") {
-          badgeClass = "bg-success";
-          iconClass = "bi-check-circle-fill";
-        } else if (value === "Restituita") {
-          badgeClass = "bg-warning text-dark";
-          iconClass = "bi-arrow-return-left";
-        } else {
-          badgeClass = "bg-secondary";
-          iconClass = "bi-dash-circle";
+        let badgeClass = "",
+          icon = "";
+        switch (cell) {
+          case "Attiva":
+            badgeClass = "bg-success";
+            icon = "bi-check-circle-fill";
+            break;
+          case "Restituita":
+            badgeClass = "bg-warning text-dark";
+            icon = "bi-arrow-return-left";
+            break;
+          default:
+            badgeClass = "bg-secondary";
+            icon = "bi-dash-circle";
         }
-
-        tableHtml +=
-          '<td><span class="badge ' +
-          badgeClass +
-          '">' +
-          '<i class="bi ' +
-          iconClass +
-          ' me-1"></i>' +
-          value +
-          "</span></td>";
+        cell = `<span class="badge ${badgeClass}"><i class="bi ${icon} me-1"></i>${cell}</span>`;
       } else if (column.isLink) {
-        tableHtml +=
-          '<td><a href="#" class="table-link" data-target="' +
-          column.linkTarget +
-          '" data-value="' +
-          value +
-          '" title="Clicca per visualizzare dettagli">' +
-          value +
-          "</a></td>";
-      } else {
-        tableHtml += "<td>" + value + "</td>";
+        cell = `<a href="#" class="table-link" data-target="${
+          column.linkTarget
+        }" data-value="${
+          row[column.name]
+        }" title="Clicca per dettagli">${cell}</a>`;
       }
+
+      tableHtml += `<td>${cell}</td>`;
     });
 
-    // Add action buttons if needed
+    // Action buttons
     if (tableName === "Veicolo") {
       tableHtml +=
         '<td class="text-center">' +
-        '<button class="btn btn-sm btn-primary me-1 edit-btn" data-id="' +
-        row.telaio +
-        '" title="Modifica veicolo"><i class="bi bi-pencil"></i> Modifica</button>' +
-        '<button class="btn btn-sm btn-danger delete-btn" data-id="' +
-        row.telaio +
-        '" title="Elimina veicolo"><i class="bi bi-trash"></i> Elimina</button>' +
+        `<button class="btn btn-sm btn-primary me-1 edit-btn" data-id="${row.telaio}" title="Modifica"><i class="bi bi-pencil"></i></button>` +
+        `<button class="btn btn-sm btn-danger delete-btn" data-id="${row.telaio}" title="Elimina"><i class="bi bi-trash"></i></button>` +
         "</td>";
     }
 
@@ -262,52 +271,51 @@ function renderTable(data, columns, tableName) {
 
   tableHtml += "</tbody></table></div>";
 
-  // Add result count
+  // Result count
   tableHtml =
-    '<div class="mb-3 text-muted small"><i class="bi bi-info-circle"></i> Trovati ' +
-    data.length +
-    " risultati</div>" +
+    `<div class="mb-3 text-muted small"><i class="bi bi-info-circle"></i> Trovati ${data.length} risultati</div>` +
     tableHtml;
 
-  // Render table and pagination
+  // Inject HTML
   $("#table-container").html(tableHtml);
 
-  // Add active indicator to newly sorted column
-  $(".sortable").on("click", function () {
-    const column = $(this).data("column");
-    const currentOrder = $(this).data("order") || "asc";
-    const newOrder = currentOrder === "asc" ? "desc" : "asc";
+  // Re-bind sorting handler
+  $(".sortable")
+    .off("click")
+    .on("click", function (e) {
+      e.preventDefault();
+      const $th = $(this);
+      const column = $th.data("column");
+      const current = $th.data("order") || "asc";
+      const next = current === "asc" ? "desc" : "asc";
 
-    // Remove all sorting indicators
-    $(".sortable")
-      .removeData("order")
-      .find("i")
-      .attr("class", "bi bi-arrow-down-up text-muted small");
+      // Reset all headers
+      $(".sortable").removeData("order").find("i").remove();
 
-    // Add sorting indicator to current column
-    $(this).data("order", newOrder);
-    const iconClass =
-      newOrder === "asc"
-        ? "bi bi-arrow-up text-primary small"
-        : "bi bi-arrow-down text-primary small";
-    $(this).find("i").attr("class", iconClass);
+      // Set new state and icon
+      $th
+        .data("order", next)
+        .append(
+          ` <i class="bi bi-arrow-${next === "asc" ? "up" : "down"}"></i>`
+        );
 
-    // Get current filter values
-    const filterData = $("#filter-form").serialize();
+      // Reload data with new sort parameters
+      const filterData = $("#filter-form").serialize();
+      const params = `${filterData}&sort=${encodeURIComponent(
+        column
+      )}&order=${next}`;
+      loadTableData(params);
+    });
 
-    // Load data with new sorting
-    loadTableData(filterData + "&sort=" + column + "&order=" + newOrder);
-  });
-
-  // Handle detail links
-  $(".table-link").on("click", function (e) {
-    e.preventDefault();
-    const target = $(this).data("target");
-    const value = $(this).data("value");
-
-    // Redirect to detail page
-    window.location.href = "../pages/" + target + ".php?id=" + value;
-  });
+  // Re-bind detail links
+  $(".table-link")
+    .off("click")
+    .on("click", function (e) {
+      e.preventDefault();
+      const target = $(this).data("target");
+      const value = $(this).data("value");
+      window.location.href = `../pages/${target}.php?id=${value}`;
+    });
 }
 
 // Format date function

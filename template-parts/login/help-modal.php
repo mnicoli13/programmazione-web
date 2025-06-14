@@ -1,6 +1,6 @@
 <!-- Help Modal -->
-<div class="modal fade" id="loginHelpModal" tabindex="-1" aria-labelledby="loginHelpModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal modal-lg fade" id="loginHelpModal" tabindex="-1" aria-labelledby="loginHelpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="helpModalLabel"><i class="bi bi-question-circle"></i> Aiuto</h5>

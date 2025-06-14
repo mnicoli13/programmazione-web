@@ -1,65 +1,215 @@
 // Document ready function for CRUD operations
 $(document).ready(function () {
-  // Show add vehicle form
-  $("#add-veicolo-btn").on("click", function () {
-    resetForm();
-    $("#veicolo-form-title").html(
-      '<i class="bi bi-plus-circle"></i> Aggiungi Veicolo'
-    );
-    $("#veicolo-form-action").val("add");
-    $("#veicolo-form-container").slideDown();
-    $("#telaio").prop("readonly", false).focus();
+  console.log("loaded crud.js");
+  // Initialize tooltips
+  var tooltipTriggerList = [].slice.call(
+    document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  );
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
   });
 
-  // Handle edit button click
-  $(document).on("click", ".edit-btn", function () {
-    const id = $(this).data("id");
-    loadVeicoloData(id);
+  // Add Vehicle from empty state
+  $("#add-veicolo-empty-btn").on("click", function () {
+    $("#addVeicoloModal").modal("show");
   });
 
-  // Submit veicolo form
-  $("#veicolo-form").on("submit", function (e) {
-    e.preventDefault();
+  // Save new vehicle
+  $("#save-add-veicolo").on("click", function () {
+    $(this).prop("disabled", true);
+    const form = $("#add-veicolo-form");
 
-    // Add loading state to submit button
-    const submitBtn = $(this).find('button[type="submit"]');
-    const originalBtnText = submitBtn.html();
-    submitBtn
-      .html(
-        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Salvataggio...'
-      )
-      .prop("disabled", true);
-
-    const formData = $(this).serialize();
-    const action = $("#veicolo-form-action").val();
-
-    if (action === "add") {
-      addVeicolo(formData, function () {
-        // Reset button after request completes
-        submitBtn.html(originalBtnText).prop("disabled", false);
-      });
-    } else {
-      updateVeicolo(formData, function () {
-        // Reset button after request completes
-        submitBtn.html(originalBtnText).prop("disabled", false);
-      });
+    // Form validation
+    if (!form[0].checkValidity()) {
+      form[0].reportValidity();
+      return;
     }
+
+    // Collect form data
+    const formData = new FormData(form[0]);
+
+    // Send data
+    $.ajax({
+      url: "../api/crud/add_veicolo.php",
+      type: "POST",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (response) {
+        if (response.status === "success") {
+          // Close modal
+          $("#addVeicoloModal").modal("hide");
+
+          // Reset form
+          form[0].reset();
+
+          // Show notification
+          showNotification(
+            '<i class="bi bi-check-circle"></i> ' + response.message,
+            "success"
+          );
+
+          // Reload data
+          loadTableData("");
+        } else {
+          showNotification(
+            '<i class="bi bi-exclamation-triangle"></i> ' + response.message,
+            "danger"
+          );
+        }
+      },
+      error: function () {
+        showNotification(
+          '<i class="bi bi-exclamation-triangle"></i> Errore durante la comunicazione con il server',
+          "danger"
+        );
+      },
+    });
+    $(this).prop("disabled", false);
   });
 
-  // Cancel form button
-  $("#cancel-form-btn, #close-form-btn").on("click", function () {
-    $("#veicolo-form-container").slideUp();
-    resetForm();
+  // Handler per il pulsante modifica nella tabella
+  $(document).on("click", ".edit-btn", function () {
+    $(this).prop("disabled", true);
+
+    const id = $(this).data("id");
+
+    // Carica i dati del veicolo
+    $.ajax({
+      url: "../api/crud/get_veicolo.php",
+      type: "GET",
+      data: { telaio: id },
+      dataType: "json",
+      success: function (response) {
+        if (response.status === "success") {
+          // Popolamento form
+          $("#edit-original-telaio").val(response.data.telaio);
+          $("#edit-telaio").val(response.data.telaio);
+          $("#edit-marca").val(response.data.marca);
+          $("#edit-modello").val(response.data.modello);
+          $("#edit-dataProd").val(response.data.dataProd);
+
+          // Mostra modale
+          $("#editVeicoloModal").modal("show");
+        } else {
+          showNotification(
+            '<i class="bi bi-exclamation-triangle"></i> ' + response.message,
+            "danger"
+          );
+        }
+      },
+      error: function () {
+        showNotification(
+          '<i class="bi bi-exclamation-triangle"></i> Errore durante il caricamento dei dati del veicolo',
+          "danger"
+        );
+      },
+    });
+    $(this).prop("disabled", false);
   });
 
-  // Function to reset form
-  function resetForm() {
-    $("#veicolo-form")[0].reset();
-    $("#veicolo-form").find(".is-invalid").removeClass("is-invalid");
-    $("#veicolo-form").find(".invalid-feedback").remove();
-  }
+  // Edit vehicle handler
+  $("#save-edit-veicolo").on("click", function () {
+    $(this).prop("disabled", true);
+    const form = $("#edit-veicolo-form");
+
+    // Form validation
+    if (!form[0].checkValidity()) {
+      form[0].reportValidity();
+      return;
+    }
+
+    // Collect form data
+    const formData = new FormData(form[0]);
+
+    // Send data
+    $.ajax({
+      url: "../api/crud/update_veicolo.php",
+      type: "POST",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (response) {
+        if (response.status === "success") {
+          // Close modal
+          $("#editVeicoloModal").modal("hide");
+
+          // Show notification
+          showNotification(
+            '<i class="bi bi-check-circle"></i> ' + response.message,
+            "success"
+          );
+
+          // Reload data
+          loadTableData("");
+        } else {
+          showNotification(
+            '<i class="bi bi-exclamation-triangle"></i> ' + response.message,
+            "danger"
+          );
+        }
+      },
+      error: function () {
+        showNotification(
+          '<i class="bi bi-exclamation-triangle"></i> Errore durante la comunicazione con il server',
+          "danger"
+        );
+      },
+    });
+    $(this).prop("disabled", false);
+  });
+
+  $(document).on("click", ".delete-btn", function () {
+    $(this).prop("disabled", true);
+    const id = $(this).data("id");
+    $("#delete-telaio").val(id);
+    $("#delete-telaio-display").text(id);
+    $("#deleteVeicoloModal").modal("show");
+    $(this).prop("disabled", false);
+  });
+
+  // Delete vehicle handler
+  $("#confirm-delete-veicolo").on("click", function () {
+    $(this).prop("disabled", true);
+    const form = $("#delete-veicolo-form");
+    const formData = new FormData(form[0]);
+
+    $.ajax({
+      url: "../api/crud/delete_veicolo.php",
+      type: "POST",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (response) {
+        if (response.status === "success") {
+          // Close modal
+          $("#deleteVeicoloModal").modal("hide");
+
+          // Show notification
+          showNotification(
+            '<i class="bi bi-check-circle"></i> ' + response.message,
+            "success"
+          );
+
+          // Reload data
+          loadTableData("");
+        } else {
+          showNotification(
+            '<i class="bi bi-exclamation-triangle"></i> ' + response.message,
+            "danger"
+          );
+        }
+      },
+      error: function () {
+        showNotification(
+          '<i class="bi bi-exclamation-triangle"></i> Errore durante la comunicazione con il server',
+          "danger"
+        );
+      },
+    });
+    $(this).prop("disabled", false);
+  });
 });
-
 // Function to load vehicle data for editing
 function loadVeicoloData(telaio) {
   // Show loading state in form title
@@ -133,8 +283,12 @@ function addVeicolo(formData, callback) {
       if (callback) callback();
     },
     error: function (xhr, status, error) {
+      console.log("error: ", error);
+      console.log("status: ", status);
+      console.log("xhr: ", xhr);
+      const errorMessage = error || "Errore di comunicazione con il server";
       showNotification(
-        '<i class="bi bi-wifi-off"></i> Errore di comunicazione con il server',
+        `<i class="bi bi-wifi-off"></i> ${errorMessage}`,
         "error"
       );
       if (callback) callback();
