@@ -15,13 +15,4 @@ $(document).ready(function () {
   popoverTriggerList.map(function (popoverTriggerEl) {
     return new bootstrap.Popover(popoverTriggerEl);
   });
-
-  // Dynamic link handling for related tables
-  $(document).on("click", ".table-link", function (e) {
-    e.preventDefault();
-    const target = $(this).data("target");
-    const value = $(this).data("value");
-
-    window.location.href = "?page=" + target + "&filter=" + value;
-  });
 });

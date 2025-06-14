@@ -14,6 +14,9 @@ $filterFields = [
 
 // Descrizione della pagina e dei filtri disponibili
 $pageDescription = "In questa sezione puoi visualizzare tutte le targhe registrate nel sistema con le relative date di emissione e il loro stato attuale (Attiva, Restituita o Non assegnata). Puoi filtrare le targhe per numero, data di emissione o stato.";
+
+// Get targa from URL if present
+$targaFromUrl = isset($_GET['targa']) ? $_GET['targa'] : null;
 ?>
 
 <?php include("../template-parts/header.php") ?>
@@ -98,5 +101,18 @@ $pageDescription = "In questa sezione puoi visualizzare tutte le targhe registra
         </div>
     </div>
 </div>
+
+<?php if ($targaFromUrl): ?>
+<script>
+    // Wait for document ready
+    $(document).ready(function() {
+        // Set the filter value
+        $('#filter-numero').val('<?php echo htmlspecialchars($targaFromUrl); ?>');
+        
+        // Trigger the filter form submission
+        $('#filter-form').submit();
+    });
+</script>
+<?php endif; ?>
 
 <?php include("../template-parts/footer.php") ?>

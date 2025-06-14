@@ -1,13 +1,5 @@
 // Document ready function for filter functionality
 $(document).ready(function () {
-  // Inizializza tooltips per i filtri
-  var tooltipTriggerList = [].slice.call(
-    document.querySelectorAll('[data-bs-toggle="tooltip"]')
-  );
-  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl);
-  });
-
   // Submit filter form
   $("#filter-form").on("submit", function (e) {
     e.preventDefault();
@@ -243,7 +235,9 @@ function renderTable(
         }
         cell = `<span class="badge ${badgeClass}"><i class="bi ${icon} me-1"></i>${cell}</span>`;
       } else if (col.isLink) {
-        cell = `<a href="#" class="table-link" data-target="${
+        cell = `<a href="./${col.linkTarget}.php?${
+          col.name
+        }=${cell}" class="table-link" data-target="${
           col.linkTarget
         }" data-value="${row[col.name]}">${cell}</a>`;
       }
@@ -279,17 +273,6 @@ function renderTable(
       const params =
         $("#filter-form").serialize() + "&sort=" + column + "&order=" + next;
       loadTableData(params);
-    });
-
-  // Link di dettaglio
-  $tbody
-    .find(".table-link")
-    .off("click")
-    .on("click", function (e) {
-      e.preventDefault();
-      const t = $(this).data("target");
-      const v = $(this).data("value");
-      window.location.href = `../pages/${t}.php?id=${v}`;
     });
 }
 
