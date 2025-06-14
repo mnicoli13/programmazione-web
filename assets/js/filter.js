@@ -293,9 +293,9 @@ function renderTable(
     });
 }
 
-// Format date function
+// Function to format date for display
 function formatDate(dateString) {
-  const options = { day: "2-digit", month: "2-digit", year: "numeric" };
+  if (!dateString) return "";
   const date = new Date(dateString);
-  return date.toLocaleDateString("it-IT", options);
+  return date.toLocaleDateString("it-IT");
 }
